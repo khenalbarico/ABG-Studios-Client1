@@ -4,29 +4,32 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlazorApp1</title>
+    <title>ABG Studios</title>
     <base href="/" />
+    <link rel="icon" href="favicon.ico.png" />
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/app.css" />
-    <!-- If you add any scoped CSS files, uncomment the following to load them
-    <link href="BlazorApp1.styles.css" rel="stylesheet" /> -->
+    <link rel="stylesheet" href="css/theme.css" />
+    <link href="BlazorApp1.styles.css" rel="stylesheet" />
     <script type="importmap"></script>
 </head>
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="app-boot-loader">
+            <div class="app-boot-spinner"></div>
+            <p>Loading ABG Studios…</p>
+        </div>
     </div>
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
+        Something went wrong. Please reload the page.
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script src="js/policyForms.js"></script>
+    <script src="js/site.js"></script>
+    <script src="js/qrcode.min.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
 

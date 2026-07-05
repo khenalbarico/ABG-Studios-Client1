@@ -1,0 +1,185 @@
+﻿@implements IDisposable
+@inject IJSRuntime JS
+
+<div class="policy-card">
+    <div class="policy-scroll" @ref="scrollRef" @onscroll="HandleScroll">
+        <div class="policy-section policy-highlight">
+            <h4>Before You Proceed</h4>
+            <p>These rules apply to all nail bookings to protect your slot, service time, and overall appointment flow.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>Removal Appointment Requirement</h4>
+            <p>If you have removal, you must arrive <strong>1 hour before</strong> your chosen schedule or time slot.</p>
+            <p class="policy-note">Failure to arrive 1 hour before means <strong>no refund</strong> and <strong>no reschedule</strong>.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>Late Arrival: 15–19 Minutes</h4>
+            <p>A <strong>₱150 late fee</strong> will apply and the design will be adjusted to <strong>plain design only</strong>.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>Late Arrival: 20 Minutes</h4>
+            <p>Your appointment will be <strong>cancelled</strong>.</p>
+            <p class="policy-note"><strong>No refund</strong> and <strong>no reschedule</strong>.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>No Show Policy</h4>
+            <p>No-show clients are not eligible for refund or reschedule.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>Rescheduling Policy</h4>
+            <p>Rescheduling is allowed <strong>only if someone else takes your original slot</strong>.</p>
+            <p>If no one takes your slot, rescheduling cannot be granted.</p>
+            <p class="policy-note">If approved and a new slot is available, a <strong>₱200 rescheduling fee</strong> must be paid first to secure the new schedule.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>Technician Delay</h4>
+            <p>If the nail technician runs late due to the complexity of the previous client’s design, your chosen design will still be accommodated.</p>
+        </div>
+
+        <div class="policy-section">
+            <h4>Damaged Nails</h4>
+            <p>Please do not proceed with booking if you have damaged nails.</p>
+            <p class="policy-note">A damaged nails sample photo may be required for checking.</p>
+        </div>
+
+        <div class="policy-section policy-last">
+            <h4>Damage After Booking</h4>
+            <p>If any damage occurs to your nails after booking your appointment, please message the page and sign a waiver upon arrival at the store.</p>
+        </div>
+    </div>
+
+    <div class="policy-readiness">
+        @if (!hasReachedBottom)
+        {
+            <div class="policy-status">Please scroll to the end of the rules to unlock the next step.</div>
+        }
+        else if (countdownActive)
+        {
+            <div class="policy-status">Please wait @countdown seconds before proceeding.</div>
+        }
+        else
+        {
+            <div class="policy-status policy-status-ready">You may now continue to the next step.</div>
+        }
+    </div>
+
+    <div class="policy-checkbox-wrap">
+        <label class="policy-check">
+            <input type="checkbox" @bind="isAccepted" />
+            <span>I have read and understood the nails service rules and I agree to proceed.</span>
+        </label>
+    </div>
+
+    <div class="policy-actions">
+        <button type="button" class="secondary-btn" @onclick="HandleBack">Back</button>
+        <button type="button" class="primary-btn" disabled="@(!CanProceed)" @onclick="HandleProceed">@ProceedLabel</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnProceed { get; set; }
+    [Parameter] public EventCallback OnBack { get; set; }
+    [Parameter] public ConsentModel Model { get; set; } = new();
+
+    private ElementReference scrollRef;
+    private CancellationTokenSource? countdownCts;
+
+    private bool isAccepted;
+    private bool hasReachedBottom;
+    private bool countdownActive;
+    private bool countdownFinished;
+    private int countdown = 3;
+
+    private bool CanProceed => isAccepted && countdownFinished;
+
+    private string ProceedLabel
+    {
+        get
+        {
+            if (!hasReachedBottom)
+                return "Scroll to Continue";
+
+            if (countdownActive)
+                return $"Proceed in {countdown}s";
+
+            if (!isAccepted)
+                return "Agree to Continue";
+
+            return "Proceed to Next Step";
+        }
+    }
+
+    private async Task HandleProceed()
+    {
+        if (!CanProceed)
+            return;
+
+        Model.NailsRulesReadAndUnderstood = true;
+        Model.NailsRulesAgreed = true;
+        Model.NailsRulesAgreedAt = DateTime.Now;
+
+        await OnProceed.InvokeAsync();
+    }
+
+    private async Task HandleBack()
+    {
+        countdownCts?.Cancel();
+        await OnBack.InvokeAsync();
+    }
+
+    private async Task HandleScroll()
+    {
+        if (hasReachedBottom || countdownActive || countdownFinished)
+            return;
+
+        var info = await JS.InvokeAsync<ScrollState>("policyForms.getScrollState", scrollRef);
+
+        if (!info.IsAtBottom)
+            return;
+
+        hasReachedBottom = true;
+        countdownActive = true;
+        countdownFinished = false;
+        countdown = 3;
+
+        countdownCts?.Cancel();
+        countdownCts?.Dispose();
+        countdownCts = new CancellationTokenSource();
+
+        await InvokeAsync(StateHasChanged);
+        await StartCountdown(countdownCts.Token);
+    }
+
+    private async Task StartCountdown(CancellationToken ct)
+    {
+        try
+        {
+            while (countdown > 0)
+            {
+                await Task.Delay(1000, ct);
+                countdown--;
+                await InvokeAsync(StateHasChanged);
+            }
+
+            countdownActive = false;
+            countdownFinished = true;
+            countdown = 0;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        countdownCts?.Cancel();
+        countdownCts?.Dispose();
+    }
+}

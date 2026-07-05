@@ -1,0 +1,64 @@
+﻿@inherits   ErrorBoundary
+@inject     AppGlobalError    GlobalError
+@inject     NavigationManager NavigationManager
+@implements IDisposable
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <div class="app-error-backdrop">
+        <div class="app-error-modal" role="alertdialog" aria-modal="true" aria-labelledby="app-error-title">
+            <div class="app-error-badge">Application Error</div>
+
+            <h2 id="app-error-title" class="app-error-title">Something went wrong</h2>
+
+            <p class="app-error-message">
+                An error has occured: "@GetSafeMessage(CurrentException)". Please try again and restart the web.
+            </p>
+
+            <div class="app-error-actions">
+                <button class="app-error-btn" @onclick="RestartApp">
+                    Restart Web
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        GlobalError.OnError += HandleExternalErrorAsync;
+        base.OnInitialized();
+    }
+
+    private async Task HandleExternalErrorAsync(Exception exception)
+    {
+        await InvokeAsync(() => DispatchExceptionAsync(exception));
+    }
+
+    private void RestartApp()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    private static string GetSafeMessage(Exception? ex)
+    {
+        if (ex is null)
+            return "Unknown error";
+
+        return string.IsNullOrWhiteSpace(ex.Message)
+            ? ex.GetType().Name
+            : ex.Message;
+    }
+
+    public void Dispose()
+    {
+        GlobalError.OnError -= HandleExternalErrorAsync;
+    }
+}
+
+

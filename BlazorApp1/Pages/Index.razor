@@ -1,0 +1,150 @@
+@page "/"
+@inject ApiClient      Api
+@inject AppGlobalError GlobalError
+
+<PageTitle>ABG Studios Services</PageTitle>
+
+<div class="page-shell">
+    <div class="page-bg"></div>
+
+    <section class="hero-section">
+        <div class="hero-badge">Online web service booking</div>
+        <h1>ABG Studios Services</h1>
+        <p>Book elegant treatments with a smooth and modern experience</p>
+    </section>
+
+    @if (_services is null)
+    {
+        <div class="state-card">
+            <div class="loader-ring"></div>
+            <span>Loading services...</span>
+        </div>
+    }
+    else
+    {
+        <ServiceSection @key="@($"nails-{_uiVersion}")"
+                        Title="Nails"
+                        Services="_services.Nails.Cast<BaseSvcStructure>().ToList()"
+                        BookedUids="_clientRequest.ClientServices.Select(x => x.ServiceUid).ToList()"
+                        AppointmentSchedules="_appointmentSchedules"
+                        CurrentBookings="_clientRequest.ClientServices"
+                        ScheduleCfg="_scheduleCfg"
+                        OnBook="HandleBook" />
+
+        <ServiceSection @key="@($"lashes-{_uiVersion}")"
+                        Title="Lashes"
+                        Services="_services.Lashes.Cast<BaseSvcStructure>().ToList()"
+                        BookedUids="_clientRequest.ClientServices.Select(x => x.ServiceUid).ToList()"
+                        AppointmentSchedules="_appointmentSchedules"
+                        CurrentBookings="_clientRequest.ClientServices"
+                        ScheduleCfg="_scheduleCfg"
+                        OnBook="HandleBook" />
+
+        <ServiceSection @key="@($"eyebrows-{_uiVersion}")"
+                        Title="Eyebrows"
+                        Services="_services.Eyebrows.Cast<BaseSvcStructure>().ToList()"
+                        BookedUids="_clientRequest.ClientServices.Select(x => x.ServiceUid).ToList()"
+                        AppointmentSchedules="_appointmentSchedules"
+                        CurrentBookings="_clientRequest.ClientServices"
+                        ScheduleCfg="_scheduleCfg"
+                        OnBook="HandleBook" />
+
+        <ServiceSection @key="@($"footspa-{_uiVersion}")"
+                        Title="Footspa"
+                        Services="_services.Footspa.Cast<BaseSvcStructure>().ToList()"
+                        BookedUids="_clientRequest.ClientServices.Select(x => x.ServiceUid).ToList()"
+                        AppointmentSchedules="_appointmentSchedules"
+                        CurrentBookings="_clientRequest.ClientServices"
+                        ScheduleCfg="_scheduleCfg"
+                        OnBook="HandleBook" />
+
+        <ServiceSection @key="@($"pedicure-{_uiVersion}")"
+                        Title="Pedicure"
+                        Services="_services.Pedicure.Cast<BaseSvcStructure>().ToList()"
+                        BookedUids="_clientRequest.ClientServices.Select(x => x.ServiceUid).ToList()"
+                        AppointmentSchedules="_appointmentSchedules"
+                        CurrentBookings="_clientRequest.ClientServices"
+                        ScheduleCfg="_scheduleCfg"
+                        OnBook="HandleBook" />
+    }
+
+    <button class="checkout-fab" @onclick="ToggleCheckout">
+        <span class="checkout-fab-label">Checkout</span>
+        <span class="checkout-fab-count">@_clientRequest.ClientServices.Count</span>
+    </button>
+
+    @if (showCheckout)
+    {
+        <div class="checkout-overlay" @onclick="ToggleCheckout">
+            <div class="checkout-modal" @onclick:stopPropagation="true">
+                <ServiceCheckout @key="@($"checkout-{_uiVersion}")"
+                                 Request="_clientRequest"
+                                 Services="_services"
+                                 OnRemove="RemoveService"
+                                 OnClose="ToggleCheckout"
+                                 OnCompleted="HandleCompleted"
+                                 OnSchedulesChanged="LoadDataAsync" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    ServiceCollectionResp? _services;
+    List<ApptSchedRec> _appointmentSchedules = new();
+    ClientRequest _clientRequest = new();
+    ScheduleCfg _scheduleCfg = new();
+    bool showCheckout;
+    int _uiVersion;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var catalog = await Api.GetCatalogAsync(DateTime.Today, DateTime.Today.AddDays(62));
+
+            _services             = catalog.Services;
+            _appointmentSchedules = catalog.Appointments;
+            _scheduleCfg          = catalog.ScheduleCfg;
+        }
+        catch (Exception ex)
+        {
+            await GlobalError.ShowAsync(ex);
+        }
+    }
+
+    private void HandleBook(ClientService svc)
+    {
+        if (!_clientRequest.ClientServices.Any(x => x.ServiceUid == svc.ServiceUid))
+        {
+            _clientRequest.ClientServices.Add(svc);
+        }
+    }
+
+    private void RemoveService(string uid)
+    {
+        var item = _clientRequest.ClientServices.FirstOrDefault(x => x.ServiceUid == uid);
+        if (item != null)
+        {
+            _clientRequest.ClientServices.Remove(item);
+        }
+    }
+
+    private void ToggleCheckout() => showCheckout = !showCheckout;
+
+    private async Task HandleCompleted()
+    {
+        _clientRequest = new ClientRequest();
+        showCheckout   = false;
+        _uiVersion++;
+
+        await LoadDataAsync();
+
+        StateHasChanged();
+    }
+}

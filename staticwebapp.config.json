@@ -1,0 +1,49 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/imgs/*", "/css/*", "/js/*", "/_framework/*", "/api/*"]
+  },
+  "routes": [
+    {
+      "route": "/api/bookings",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/api/payments/*",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/login/google",
+      "redirect": "/.auth/login/google"
+    },
+    {
+      "route": "/login/facebook",
+      "redirect": "/.auth/login/facebook"
+    },
+    {
+      "route": "/logout",
+      "redirect": "/.auth/logout"
+    }
+  ],
+  "auth": {
+    "identityProviders": {
+      "google": {
+        "registration": {
+          "clientIdSettingName": "GOOGLE_CLIENT_ID",
+          "clientSecretSettingName": "GOOGLE_CLIENT_SECRET"
+        }
+      },
+      "facebook": {
+        "registration": {
+          "appIdSettingName": "FACEBOOK_APP_ID",
+          "appSecretSettingName": "FACEBOOK_APP_SECRET"
+        }
+      }
+    }
+  },
+  "responseOverrides": {
+    "401": {
+      "statusCode": 401
+    }
+  }
+}

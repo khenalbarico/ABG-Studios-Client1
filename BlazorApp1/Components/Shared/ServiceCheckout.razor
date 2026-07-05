@@ -1,0 +1,312 @@
+@inject ApiClient   Api
+@inject AuthService Auth
+@inject IJSRuntime  JS
+
+<div class="checkout-container">
+
+    @if (isLoading)
+    {
+        <div class="loading-overlay">
+            <div class="loading-box">
+                <div class="spinner"></div>
+                <p>Processing your request...</p>
+            </div>
+        </div>
+    }
+
+    @if (showConfirmModal)
+    {
+        <div class="modal-overlay">
+            <div class="confirm-modal fade-in">
+                <div class="checkout-header">
+                    <div class="checkout-badge">Confirm Details</div>
+                    <h3>Are you sure these details are correct?</h3>
+                    <p>Please review your information carefully before proceeding to QR payment.</p>
+                </div>
+
+                <div class="confirm-alert">
+                    <div class="confirm-alert-icon">✦</div>
+                    <div class="confirm-alert-text">
+                        <strong>Your proof of purchase will be a QR code.</strong>
+                        <span>After successful payment, save the QR code shown on screen — the studio will scan it when you arrive.</span>
+                    </div>
+                </div>
+
+                <div class="confirm-section">
+                    <div class="confirm-block">
+                        <div class="confirm-title">Client Information</div>
+                        <div class="confirm-grid">
+                            <div class="confirm-item">
+                                <span>First Name</span>
+                                <strong>@Request.ClientInformation.FirstName</strong>
+                            </div>
+                            <div class="confirm-item">
+                                <span>Last Name</span>
+                                <strong>@Request.ClientInformation.LastName</strong>
+                            </div>
+                            <div class="confirm-item confirm-item-email">
+                                <span>Email</span>
+                                <strong>@Request.ClientInformation.Email</strong>
+                            </div>
+                            <div class="confirm-item">
+                                <span>Contact Number</span>
+                                <strong>@Request.ClientInformation.ContactNumber</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confirm-block">
+                        <div class="confirm-title">Selected Services</div>
+                        <div class="confirm-service-list">
+                            @foreach (var s in Request.ClientServices)
+                            {
+                                <div class="confirm-service-card">
+                                    <div class="confirm-service-name">@s.ServiceName</div>
+                                    <div class="confirm-service-details">@s.ServiceDetails</div>
+                                    <div class="confirm-service-meta">
+                                        <span>@GetBranchDisplayName(s.Branch)</span>
+                                        <span>@s.ServiceDate.ToString("MMMM dd, yyyy")</span>
+                                        <span>@s.ServiceDate.ToString("hh:mm tt")</span>
+                                    </div>
+                                    <div class="confirm-service-price">₱@s.ServiceCost</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-row">
+                            <span>Total Amount</span>
+                            <strong>₱@GetTotalAmount()</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="primary-btn" @onclick="ConfirmProceed">Yes, Proceed</button>
+                    <button type="button" class="secondary-btn" @onclick="CloseConfirmModal">Edit Details</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (ShowSummary)
+    {
+        <div class="checkout-header fade-in">
+            <div class="checkout-badge">Booking Summary</div>
+            <h2>Your Booking</h2>
+            <p>Review your selected services before confirming your appointment</p>
+        </div>
+
+        @if (Request.ClientServices.Count == 0)
+        {
+            <div class="empty-state fade-in">
+                <div class="empty-icon">✦</div>
+                <p>No services selected yet</p>
+            </div>
+        }
+        else
+        {
+            <div class="booking-list fade-in">
+                @foreach (var s in Request.ClientServices)
+                {
+                    <div class="booking-card slide-up">
+                        <div class="booking-left">
+                            <div class="booking-name">@s.ServiceName</div>
+                            <div class="booking-details">@s.ServiceDetails</div>
+                            <div class="booking-meta">
+                                <span>@GetBranchDisplayName(s.Branch)</span>
+                                <span>@s.ServiceDate.ToString("MMMM dd, yyyy")</span>
+                                <span>@s.ServiceDate.ToString("hh:mm tt")</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-right">
+                            <div class="booking-price">₱@s.ServiceCost</div>
+                            <button class="remove-btn" @onclick="() => Remove(s.ServiceUid)">Remove</button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="summary-card fade-in">
+                <div class="summary-row">
+                    <span>Total Amount</span>
+                    <strong>₱@GetTotalAmount()</strong>
+                </div>
+
+                <button class="primary-btn" @onclick="OpenForm">
+                    Confirm Appointment
+                </button>
+            </div>
+        }
+
+        <button class="secondary-btn" @onclick="Close">Close</button>
+    }
+
+    @if (showSignIn)
+    {
+        <div class="form-section fade-in">
+            <div class="checkout-header">
+                <div class="checkout-badge">Sign In</div>
+                <h3>Sign in to book</h3>
+                <p>Booking requires a quick sign-in so we can attach your appointment to your account.</p>
+            </div>
+
+            <div class="form-actions signin-actions">
+                <a class="primary-btn signin-btn" href="@GoogleLoginHref">Continue with Google</a>
+                <a class="primary-btn signin-btn" href="@FacebookLoginHref">Continue with Facebook</a>
+                <button type="button" class="secondary-btn" @onclick="CloseSignIn">Back</button>
+            </div>
+        </div>
+    }
+
+    @if (showForm)
+    {
+        <div class="form-section fade-in">
+            <div class="checkout-header">
+                <div class="checkout-badge">Client Details</div>
+                <h3>Client Information</h3>
+                <p>Please complete the details below to continue to payment</p>
+            </div>
+
+            <EditForm Model="Request.ClientInformation" OnValidSubmit="OpenConfirmModal">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="validation-summary" />
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>First Name</label>
+                        <InputText class="form-input" placeholder="Enter first name" @bind-Value="Request.ClientInformation.FirstName" />
+                        <ValidationMessage For="@(() => Request.ClientInformation.FirstName)" />
+                    </div>
+
+                    <div class="input-group">
+                        <label>Last Name</label>
+                        <InputText class="form-input" placeholder="Enter last name" @bind-Value="Request.ClientInformation.LastName" />
+                        <ValidationMessage For="@(() => Request.ClientInformation.LastName)" />
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label>Email Address</label>
+                        <InputText class="form-input email-input"
+                                   placeholder="Enter email address"
+                                   @bind-Value="Request.ClientInformation.Email"
+                                   type="email"
+                                   inputmode="email"
+                                   autocomplete="email"
+                                   readonly="@emailLockedFromAccount" />
+                        @if (emailLockedFromAccount)
+                        {
+                            <div class="input-hint">Using the email from your signed-in account.</div>
+                        }
+                        <ValidationMessage For="@(() => Request.ClientInformation.Email)" />
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label>Contact Number</label>
+                        <InputText class="form-input" placeholder="Enter contact number" @bind-Value="Request.ClientInformation.ContactNumber" />
+                        <ValidationMessage For="@(() => Request.ClientInformation.ContactNumber)" />
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(consumerError))
+                {
+                    <div class="validation-error">@consumerError</div>
+                }
+
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">Proceed</button>
+                    <button type="button" class="secondary-btn" @onclick="CloseForm">Back</button>
+                </div>
+            </EditForm>
+        </div>
+    }
+
+    @if (showNailsRules)
+    {
+        <div class="checkout-panel fade-in">
+            <div class="checkout-header">
+                <div class="checkout-badge">Policy Review</div>
+                <h3>Nails Service Rules</h3>
+                <p>Please review the rules below before proceeding to payment.</p>
+            </div>
+
+            <NailsSvcRules Model="Request.ClientConsent"
+                           OnProceed="HandleNailsRulesAccepted"
+                           OnBack="BackFromNailsRules" />
+        </div>
+    }
+
+    @if (showConsentForm)
+    {
+        <div class="checkout-panel fade-in">
+            <div class="checkout-header">
+                <div class="checkout-badge">Consent Review</div>
+                <h3>Lash & Brow Consent Form</h3>
+                <p>Please review and complete the form below before proceeding to payment.</p>
+            </div>
+
+            <ConsentForm Model="Request.ClientConsent"
+                         OnProceed="HandleConsentAccepted"
+                         OnBack="BackFromConsentForm" />
+        </div>
+    }
+
+    @if (showQr)
+    {
+        <div class="qr-section fade-in">
+            <div class="checkout-badge">Payment</div>
+            <h3>Scan to Pay</h3>
+
+            <div class="qr-timer-wrap">
+                <div class="qr-timer-label">QR expires in</div>
+                <div class="qr-timer">@qrCountdownDisplay</div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(qrImageUrl))
+            {
+                <div class="qr-card">
+                    <img src="@qrImageUrl" class="qr-image" alt="QR Payment" />
+                </div>
+            }
+
+            <div class="waiting-box">
+                <div class="spinner small"></div>
+                <p>Waiting for payment confirmation...</p>
+                <span>
+                    This QR code is valid for 3 minutes only. If the timer ends before payment is confirmed,
+                    you will be returned to the client information form so you can generate a new QR code.
+                </span>
+            </div>
+
+            <button class="secondary-btn" @onclick="CancelPayment">Cancel Transaction</button>
+        </div>
+    }
+
+    @if (showSuccess)
+    {
+        <div class="success-section fade-in">
+            <div class="success-icon">✓</div>
+            <div class="checkout-badge success-badge">Payment Successful</div>
+            <h2>Thank you for your booking!</h2>
+            <p>Your appointment has been successfully confirmed.</p>
+
+            <div class="qr-card proof-qr-card">
+                <div id="proof-qr" class="proof-qr"></div>
+                <div class="proof-qr-code-text">@completedBookingId</div>
+            </div>
+
+            <div class="success-message-card">
+                <div class="success-message-icon">✦</div>
+                <div class="success-message-content">
+                    <strong>Save this QR code — it is your proof of purchase.</strong>
+                    <span>Take a screenshot or download it now. The studio will scan this code when you arrive to start your appointment. Your booking reference is <b>@completedBookingId</b>.</span>
+                </div>
+            </div>
+
+            <button class="primary-btn" @onclick="Finish">Done</button>
+        </div>
+    }
+
+</div>

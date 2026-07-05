@@ -1,0 +1,236 @@
+<section class="service-section">
+    <div class="section-header">
+        <div>
+            <div class="section-kicker">Category</div>
+            <h2>@Title</h2>
+        </div>
+    </div>
+
+    <div class="service-cards">
+        @foreach (var svc in Services)
+        {
+            var cardKey = GetCardKey(svc);
+            var isBooked = BookedUids.Contains(cardKey);
+            var hasBranch = HasSelectedBranch(cardKey);
+            var hasDate = HasSelectedDate(cardKey);
+            var isNails = IsNailsService();
+
+            <article class="service-card @(svc.ScheduleSlots.IsAvailable ? "" : "service-card-disabled")" @key="cardKey">
+                <div class="service-top">
+                    <div class="service-title-wrap">
+                        <div class="service-name">@svc.Details</div>
+                        <div class="service-subtitle">@Title treatment</div>
+                    </div>
+
+                    <div class="service-price">₱@svc.Cost</div>
+                </div>
+
+                <div class="field-group">
+                    <label>Select Branch</label>
+                    <select class="field-input"
+                            value="@GetSelectedBranchValue(cardKey)"
+                            @onchange="e => OnBranchChanged(cardKey, e.Value?.ToString())">
+                        <option value="">Choose branch</option>
+                        @foreach (var branch in Enum.GetValues<ServiceBranch>())
+                        {
+                            <option value="@branch.ToString()">@GetBranchLabel(branch)</option>
+                        }
+                    </select>
+                </div>
+
+                @if (isNails)
+                {
+                    <div class="field-group">
+                        <label>Design</label>
+                        <select class="field-input" value="@GetSelectedDesignValue(cardKey)" @onchange="e => OnDesignChanged(cardKey, e.Value?.ToString())">
+                            @foreach (var design in Enum.GetValues<ServiceDesigns>())
+                            {
+                                <option value="@design.ToString()">@design.ToString()</option>
+                            }
+                        </select>
+
+                        @{
+                            var selectedDesign = GetSelectedDesign(cardKey);
+                            var designImages = GetDesignImages(selectedDesign);
+                        }
+
+                        <div class="selected-design-name">
+                            Selected: <span>@selectedDesign.ToString()</span>
+                        </div>
+
+                        <div class="design-gallery">
+                            @foreach (var imageUrl in designImages)
+                            {
+                                var isLoaded = IsImageLoaded(imageUrl, selectedDesign.ToString());
+                                var hasError = HasImageError(imageUrl, selectedDesign.ToString());
+
+                                <button type="button"
+                                        class="design-image-card"
+                                        @onclick="() => OpenImagePreview(imageUrl, selectedDesign.ToString())">
+
+                                    @if (!isLoaded && !hasError)
+                                    {
+                                        <div class="image-loading-wrap">
+                                            <div class="image-spinner"></div>
+                                            <span>Loading...</span>
+                                        </div>
+                                    }
+
+                                    @if (hasError)
+                                    {
+                                        <div class="image-error-wrap">
+                                            <span>Failed to load image</span>
+                                        </div>
+                                    }
+
+                                    <img src="@imageUrl"
+                                         alt="@selectedDesign.ToString()"
+                                         class="@(isLoaded ? "design-image-visible" : "design-image-hidden")"
+                                         @onload="() => MarkImageLoaded(imageUrl, selectedDesign.ToString())"
+                                         @onerror="() => MarkImageError(imageUrl, selectedDesign.ToString())" />
+
+                                    <div class="design-image-overlay">
+                                        <span>View</span>
+                                    </div>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (hasBranch)
+                {
+                    <div class="field-group reveal-block">
+                        <label>Select Date</label>
+
+                        <div class="calendar-shell">
+                            <div class="calendar-header">
+                                <button type="button" class="calendar-nav" @onclick="() => ChangeMonth(cardKey, -1)">‹</button>
+                                <span>@GetMonthLabel(cardKey)</span>
+                                <button type="button" class="calendar-nav" @onclick="() => ChangeMonth(cardKey, 1)">›</button>
+                            </div>
+
+                            <div class="weekdays">
+                                <span>Sun</span>
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                            </div>
+
+                            <div class="calendar-grid">
+                                @foreach (var day in GetCalendarDays(svc, cardKey))
+                                {
+                                    var dayKey = $"{cardKey}-{day.Date:yyyyMMdd}";
+
+                                    <button type="button"
+                                            @key="dayKey"
+                                            class="day-button @(day.IsCurrentMonth ? "" : "outside-month") @(day.IsAllowed ? "allowed" : "blocked") @(IsSelectedDate(cardKey, day.Date) ? "selected" : "")"
+                                            disabled="@(!day.IsAllowed || isBooked || day.Date.Date < DateTime.Today)"
+                                            title="@day.Title"
+                                            @onclick="() => SelectDate(cardKey, day.Date)">
+                                        @day.Date.Day
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="availability-note">
+                            Available days: @string.Join(", ", svc.ScheduleSlots.DaySlots)
+                        </div>
+                    </div>
+                }
+
+                @if (hasDate)
+                {
+                    <div class="field-group reveal-block">
+                        <label>Select Time</label>
+
+                        <select class="field-input" value="@GetSelectedTime(cardKey)" @onchange="e => OnTimeChanged(cardKey, e.Value?.ToString())">
+                            <option value="">Choose time</option>
+                            @foreach (var t in svc.ScheduleSlots.TimeSlots)
+                            {
+                                var slotStatus = GetTimeSlotStatus(svc, cardKey, t);
+                                <option value="@t" disabled="@(slotStatus != TimeSlotStatus.Available)">@GetTimeSlotLabel(svc, cardKey, t)</option>
+                            }
+                        </select>
+
+                        @if (HasSelectedDate(cardKey))
+                        {
+                            var selectedTime = GetSelectedTime(cardKey);
+                            var selectedStatus = string.IsNullOrWhiteSpace(selectedTime)
+                            ? TimeSlotStatus.Available
+                            : GetTimeSlotStatus(svc, cardKey, selectedTime);
+
+                            if (selectedStatus == TimeSlotStatus.BookedByYou)
+                            {
+                                var conflict = GetCurrentBookingConflict(cardKey, SelectedDates[cardKey], selectedTime);
+                                var serviceLabel = conflict is null
+                                ? "another service"
+                                : (!string.IsNullOrWhiteSpace(conflict.ServiceDetails) ? conflict.ServiceDetails : conflict.ServiceName);
+
+                                <div class="slot-status-note slot-status-note-conflict">
+                                    This time is not available because you already booked <strong>@serviceLabel</strong> on @SelectedDates[cardKey].ToString("MMMM dd, yyyy") at @selectedTime.
+                                </div>
+                            }
+                            else if (selectedStatus == TimeSlotStatus.Full)
+                            {
+                                <div class="slot-status-note slot-status-note-full">
+                                    @GetFullSlotMessage(svc, cardKey, selectedTime)
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+
+                <div class="service-footer">
+                    <button type="button"
+                            class="book-button"
+                            disabled="@(!svc.ScheduleSlots.IsAvailable || isBooked || !HasSelectedBranch(cardKey) || !HasSelectedDate(cardKey) || !HasAvailableSelectedTime(svc, cardKey))"
+                            @onclick="() => Book(svc, cardKey)">
+                        @(isBooked ? "Already Added" : "Add to Booking")
+                    </button>
+                </div>
+            </article>
+        }
+    </div>
+</section>
+
+@if (showImagePreview)
+{
+    <div class="design-modal-backdrop" @onclick="CloseImagePreview">
+        <div class="design-modal" @onclick:stopPropagation="true">
+            <button type="button" class="design-modal-close" @onclick="CloseImagePreview">×</button>
+            <div class="design-modal-title">@previewTitle</div>
+            <div class="design-modal-image-wrap">
+                @{
+                    var previewLoaded = IsImageLoaded(previewImageUrl, previewTitle);
+                    var previewError = HasImageError(previewImageUrl, previewTitle);
+                }
+
+                @if (!previewLoaded && !previewError)
+                {
+                    <div class="image-loading-wrap modal-loading">
+                        <div class="image-spinner"></div>
+                        <span>Loading preview...</span>
+                    </div>
+                }
+
+                @if (previewError)
+                {
+                    <div class="image-error-wrap">
+                        <span>Failed to load preview</span>
+                    </div>
+                }
+
+                <img src="@previewImageUrl"
+                     alt="@previewTitle"
+                     class="design-modal-image @(previewLoaded ? "design-image-visible" : "design-image-hidden")"
+                     @onload="() => MarkImageLoaded(previewImageUrl, previewTitle)"
+                     @onerror="() => MarkImageError(previewImageUrl, previewTitle)" />
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,91 @@
+﻿@inject IJSRuntime JS
+
+<button type="button" class="theme-toggle-btn" @onclick="ToggleTheme" aria-label="Toggle theme">
+    @if (isDark)
+    {
+        <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    }
+    else
+    {
+        <svg class="theme-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 12.79A9 9 0 0 1 11.21 3c0 .34-.03.67-.08 1A9 9 0 1 0 20 12.87c.33-.05.66-.08 1-.08Z"></path>
+        </svg>
+    }
+</button>
+
+@code {
+    private bool isDark = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var theme = await JS.InvokeAsync<string>("eval", """
+            (() => {
+                const saved = localStorage.getItem('theme');
+                if (saved) {
+                    document.body.setAttribute('data-theme', saved);
+                    return saved;
+                }
+
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const initial = prefersDark ? 'dark' : 'light';
+                document.body.setAttribute('data-theme', initial);
+                localStorage.setItem('theme', initial);
+                return initial;
+            })()
+        """);
+
+        isDark = theme == "dark";
+        StateHasChanged();
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDark = !isDark;
+        var theme = isDark ? "dark" : "light";
+
+        await JS.InvokeVoidAsync("eval", $"""
+            document.body.setAttribute('data-theme', '{theme}');
+            localStorage.setItem('theme', '{theme}');
+        """);
+    }
+}
+
+<style>
+    .theme-toggle-btn {
+        width: 52px;
+        height: 52px;
+        border: 1px solid var(--border-soft);
+        cursor: pointer;
+        color: var(--text-primary);
+        border-radius: 50%;
+        background: var(--button-primary-bg);
+        box-shadow: var(--button-shadow);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+        .theme-toggle-btn:hover {
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: var(--button-shadow-hover);
+        }
+
+    .theme-icon {
+        width: 22px;
+        height: 22px;
+        display: block;
+    }
+</style>
