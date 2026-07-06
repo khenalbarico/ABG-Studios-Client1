@@ -1,4 +1,4 @@
-﻿.checkout-container {
+.checkout-container {
     position: relative;
     width: 100%;
     max-width: 100%;
@@ -22,7 +22,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     text-align: center;
 }
 
@@ -30,23 +30,18 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 7px 12px;
-    border-radius: 999px;
-    background: var(--surface-hover);
-    color: var(--text-primary);
-    border: 1px solid var(--border-soft);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .checkout-header h2,
 .checkout-header h3 {
     margin: 0;
     color: var(--text-primary);
-    font-size: 1.75rem;
-    font-weight: 800;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     line-height: 1.2;
 }
 
@@ -54,7 +49,7 @@
     margin: 0;
     max-width: 560px;
     color: var(--text-muted);
-    line-height: 1.6;
+    line-height: 1.55;
     font-size: 14px;
 }
 
@@ -67,15 +62,6 @@
     padding-right: 4px;
 }
 
-    .booking-list::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .booking-list::-webkit-scrollbar-thumb {
-        background: var(--surface-strong);
-        border-radius: 999px;
-    }
-
 .booking-card {
     width: 100%;
     display: grid;
@@ -83,8 +69,8 @@
     align-items: start;
     gap: 16px;
     padding: 16px;
-    border-radius: 20px;
-    background: var(--surface-main);
+    border-radius: 14px;
+    background: var(--surface-soft);
     border: 1px solid var(--border-soft);
     box-sizing: border-box;
 }
@@ -98,7 +84,7 @@
 
 .booking-name {
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-primary);
     word-break: break-word;
 }
@@ -113,17 +99,17 @@
 .booking-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
     .booking-meta span {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--surface-soft);
-        color: var(--text-muted);
+        padding: 4px 10px;
+        border-radius: 980px;
+        background: var(--surface-hover);
+        color: var(--text-secondary);
         font-size: 12px;
         white-space: nowrap;
     }
@@ -138,7 +124,7 @@
 
 .booking-price {
     font-size: 16px;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-primary);
     text-align: right;
     white-space: nowrap;
@@ -146,25 +132,25 @@
 
 .remove-btn {
     border: none;
-    padding: 8px 12px;
-    border-radius: 12px;
-    background: var(--surface-hover);
-    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 980px;
+    background: transparent;
+    color: var(--danger-text);
     cursor: pointer;
-    transition: background .2s ease, transform .2s ease;
-    font-weight: 700;
+    transition: background .2s ease;
+    font-weight: 600;
+    font-size: 13px;
     white-space: nowrap;
 }
 
     .remove-btn:hover {
-        background: var(--surface-strong);
-        transform: translateY(-1px);
+        background: var(--danger-bg);
     }
 
 .summary-card {
     width: 100%;
     padding: 18px;
-    border-radius: 20px;
+    border-radius: 14px;
     background: var(--surface-soft);
     border: 1px solid var(--border-soft);
     display: flex;
@@ -184,6 +170,7 @@
 
     .summary-row strong {
         font-size: 1.1rem;
+        font-weight: 600;
         color: var(--text-primary);
         white-space: nowrap;
     }
@@ -194,42 +181,42 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16px;
-    padding: 13px 16px;
-    font-size: 14px;
-    font-weight: 800;
+    border-radius: 980px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+    transition: background .2s ease, transform .2s ease, opacity .2s ease;
     box-sizing: border-box;
 }
 
 .primary-btn {
-    border: 1px solid var(--border-soft);
+    border: none;
     background: var(--button-primary-bg);
-    color: var(--text-primary);
-    box-shadow: var(--button-shadow);
+    color: var(--button-primary-text);
 }
 
     .primary-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: var(--button-shadow-hover);
+        background: var(--accent-hover);
+    }
+
+    .primary-btn:active:not(:disabled) {
+        transform: scale(0.98);
     }
 
     .primary-btn:disabled {
-        opacity: .5;
+        opacity: .4;
         cursor: not-allowed;
-        box-shadow: none;
     }
 
 .secondary-btn {
-    border: 1px solid var(--border-soft);
-    background: transparent;
+    border: none;
+    background: var(--surface-hover);
     color: var(--text-primary);
 }
 
     .secondary-btn:hover {
-        background: var(--surface-soft);
-        border-color: var(--border-strong);
+        background: var(--surface-strong);
     }
 
 .form-section {
@@ -250,14 +237,12 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
 }
 
     .input-group label {
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: .04em;
-        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 600;
         color: var(--text-secondary);
     }
 
@@ -268,31 +253,30 @@
 .form-input {
     width: 100%;
     min-width: 0;
-    padding: 12px 14px;
-    border-radius: 14px;
+    padding: 11px 14px;
+    border-radius: 12px;
     background: var(--input-bg);
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border-strong);
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 15px;
     outline: none;
-    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease;
     box-sizing: border-box;
 }
 
     .form-input:focus {
-        border-color: var(--border-strong);
+        border-color: var(--accent);
         box-shadow: 0 0 0 4px var(--input-focus);
-        background: var(--surface-hover);
     }
 
     .form-input::placeholder {
         color: var(--text-muted);
     }
 
-.email-input {
-    border-color: rgba(255, 193, 7, 0.35);
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), var(--input-bg);
-}
+    .form-input[readonly] {
+        background: var(--surface-soft);
+        color: var(--text-secondary);
+    }
 
 .input-hint {
     font-size: 12px;
@@ -302,7 +286,7 @@
 }
 
 .validation-summary {
-    color: var(--text-primary);
+    color: var(--danger-text);
     font-size: 13px;
 }
 
@@ -312,37 +296,16 @@
     }
 
 .validation-error {
-    position: relative;
     width: 100%;
-    padding: 14px 16px 14px 44px;
-    border-radius: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
     background: var(--danger-bg);
-    border: 1px solid var(--border-soft);
     color: var(--danger-text);
     font-size: 13px;
     line-height: 1.55;
     box-sizing: border-box;
-    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
     animation: errorShake .28s ease;
 }
-
-    .validation-error::before {
-        content: "!";
-        position: absolute;
-        top: 50%;
-        left: 14px;
-        transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--surface-strong);
-        color: var(--text-primary);
-        font-size: 12px;
-        font-weight: 900;
-    }
 
 .form-actions {
     display: flex;
@@ -365,34 +328,35 @@
     align-items: flex-start;
     gap: 12px;
     padding: 16px 18px;
-    border-radius: 18px;
+    border-radius: 14px;
     border: 1px solid var(--border-soft);
     box-sizing: border-box;
 }
 
 .email-reminder-card,
 .confirm-alert {
-    background: linear-gradient(135deg, rgba(255, 204, 102, 0.14), rgba(255, 255, 255, 0.02));
+    background: var(--warning-bg);
+    border-color: transparent;
 }
 
 .success-message-card {
     max-width: 560px;
-    background: linear-gradient(135deg, rgba(100, 255, 180, 0.14), rgba(255, 255, 255, 0.02));
+    background: var(--success-bg);
+    border-color: transparent;
 }
 
 .email-reminder-icon,
 .confirm-alert-icon,
 .success-message-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--surface-main);
-    border: 1px solid var(--border-soft);
     color: var(--text-primary);
-    font-size: 18px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
@@ -410,6 +374,7 @@
     .success-message-content strong {
         color: var(--text-primary);
         font-size: 14px;
+        font-weight: 600;
         line-height: 1.4;
     }
 
@@ -433,15 +398,17 @@
     .qr-section h3 {
         margin: 0;
         color: var(--text-primary);
-        font-size: 1.6rem;
-        font-weight: 800;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
     }
 
 .qr-card {
     padding: 18px;
-    border-radius: 24px;
+    border-radius: 18px;
     background: #ffffff;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-main);
 }
 
 .qr-image {
@@ -483,27 +450,28 @@
 }
 
 .success-icon {
-    width: 74px;
-    height: 74px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--success-bg);
-    border: 1px solid var(--border-soft);
     color: var(--success-text);
-    font-size: 34px;
-    font-weight: 900;
+    font-size: 32px;
+    font-weight: 600;
 }
 
 .success-badge {
-    background: rgba(60, 180, 120, 0.14);
+    color: var(--success-text);
 }
 
 .success-section h2 {
     margin: 0;
     color: var(--text-primary);
-    font-size: 1.8rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
 .success-section p {
@@ -518,7 +486,7 @@
     justify-content: center;
     gap: 10px;
     padding: 34px 18px;
-    border-radius: 22px;
+    border-radius: 14px;
     background: var(--surface-soft);
     border: 1px solid var(--border-soft);
     color: var(--text-secondary);
@@ -526,15 +494,15 @@
 }
 
 .empty-icon {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--surface-hover);
-    color: var(--text-primary);
-    font-size: 24px;
+    color: var(--text-muted);
+    font-size: 22px;
 }
 
 .loading-overlay {
@@ -545,8 +513,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 24px;
-    backdrop-filter: blur(8px);
+    border-radius: inherit;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 .loading-box {
@@ -554,23 +523,24 @@
     flex-direction: column;
     align-items: center;
     gap: 14px;
-    color: var(--text-primary);
+    color: #f5f5f7;
     text-align: center;
 }
 
 .spinner {
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    border: 4px solid var(--border-soft);
-    border-top-color: var(--text-primary);
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #f5f5f7;
     animation: spin 1s linear infinite;
 }
 
     .spinner.small {
         width: 20px;
         height: 20px;
-        border-width: 3px;
+        border-color: var(--border-soft);
+        border-top-color: var(--text-muted);
     }
 
 .fade-in {
@@ -585,26 +555,27 @@
     position: fixed;
     inset: 0;
     z-index: 50;
-    background: rgba(0, 0, 0, 0.65);
+    background: var(--overlay-dark);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
 }
 
 .confirm-modal {
     width: 100%;
-    max-width: 760px;
-    max-height: 90vh;
+    max-width: 720px;
+    max-height: 90dvh;
     overflow-y: auto;
     background: var(--surface-main);
     border: 1px solid var(--border-soft);
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 24px;
     box-sizing: border-box;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--shadow-strong);
 }
 
 .confirm-section {
@@ -617,7 +588,7 @@
 .confirm-block {
     background: var(--surface-soft);
     border: 1px solid var(--border-soft);
-    border-radius: 20px;
+    border-radius: 14px;
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -625,11 +596,9 @@
 }
 
 .confirm-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: .05em;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
 }
 
 .confirm-grid {
@@ -641,31 +610,28 @@
 .confirm-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     padding: 12px 14px;
     background: var(--surface-main);
     border: 1px solid var(--border-soft);
-    border-radius: 14px;
+    border-radius: 12px;
     min-width: 0;
 }
 
     .confirm-item span {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: .05em;
+        font-size: 12px;
         color: var(--text-muted);
-        font-weight: 700;
     }
 
     .confirm-item strong {
         font-size: 14px;
+        font-weight: 600;
         color: var(--text-primary);
         word-break: break-word;
     }
 
 .confirm-item-email {
-    border-color: rgba(255, 193, 7, 0.35);
-    box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.12) inset;
+    border-color: var(--border-strong);
 }
 
 .confirm-service-list {
@@ -677,7 +643,7 @@
 .confirm-service-card {
     background: var(--surface-main);
     border: 1px solid var(--border-soft);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 14px;
     display: flex;
     flex-direction: column;
@@ -686,7 +652,7 @@
 
 .confirm-service-name {
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-primary);
 }
 
@@ -699,24 +665,24 @@
 .confirm-service-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
     .confirm-service-meta span {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--surface-soft);
-        color: var(--text-muted);
+        padding: 4px 10px;
+        border-radius: 980px;
+        background: var(--surface-hover);
+        color: var(--text-secondary);
         font-size: 12px;
         white-space: nowrap;
     }
 
 .confirm-service-price {
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-primary);
 }
 
@@ -730,22 +696,21 @@
 
 .qr-timer-label {
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .05em;
-    text-transform: uppercase;
+    font-weight: 600;
     color: var(--text-muted);
 }
 
 .qr-timer {
     min-width: 110px;
-    padding: 10px 16px;
-    border-radius: 999px;
+    padding: 8px 16px;
+    border-radius: 980px;
     background: var(--surface-soft);
     border: 1px solid var(--border-soft);
     color: var(--text-primary);
-    font-size: 1.1rem;
-    font-weight: 900;
-    letter-spacing: .08em;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .05em;
     text-align: center;
 }
 
@@ -801,15 +766,6 @@
     }
 }
 
-.confirm-modal::-webkit-scrollbar {
-    width: 8px;
-}
-
-.confirm-modal::-webkit-scrollbar-thumb {
-    background: var(--surface-strong);
-    border-radius: 999px;
-}
-
 @media (max-width: 768px) {
     .checkout-container {
         padding: 20px;
@@ -818,7 +774,7 @@
 
     .checkout-header h2,
     .checkout-header h3 {
-        font-size: 1.45rem;
+        font-size: 1.4rem;
     }
 
     .form-grid,
@@ -831,7 +787,9 @@
     }
 
     .booking-right {
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
         min-width: 0;
     }
 
@@ -845,18 +803,11 @@
 
     .confirm-modal {
         padding: 20px;
-        border-radius: 20px;
+        border-radius: 16px;
     }
 
     .qr-image {
         width: 190px;
-    }
-
-    .email-reminder-card,
-    .confirm-alert,
-    .success-message-card {
-        padding: 14px;
-        border-radius: 16px;
     }
 }
 
@@ -870,41 +821,12 @@
         font-size: 1.25rem;
     }
 
-    .booking-card,
-    .summary-card,
-    .confirm-block,
-    .confirm-modal {
-        border-radius: 16px;
-    }
-
-    .primary-btn,
-    .secondary-btn {
-        padding: 12px 14px;
-        font-size: 13px;
-        border-radius: 14px;
-    }
-
-    .confirm-service-meta span,
-    .booking-meta span {
-        font-size: 11px;
-        padding: 5px 8px;
-    }
-
     .modal-overlay {
         padding: 12px;
     }
 
     .confirm-modal {
-        max-height: 92vh;
+        max-height: 92dvh;
         padding: 16px;
-    }
-
-    .email-reminder-icon,
-    .confirm-alert-icon,
-    .success-message-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 12px;
-        font-size: 16px;
     }
 }

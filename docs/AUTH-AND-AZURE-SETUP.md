@@ -18,8 +18,6 @@ for PROD with the PROD resources.
    `appsettings.{Development|Production}.json`.
 2. Function App settings to add (Configuration → Application settings):
    - `TablesConnectionString`
-   - `Firebase:DatabaseUrl` — your Realtime DB root URL
-   - `Firebase:AuthToken` — database secret (or leave empty if rules allow)
    - `Paymongo:SecretKey` — `sk_test_…` on DEV, `sk_live_…` on PROD
    - `Paymongo:WebhookSecretKey` — from step 4
 3. In the SWA: **Settings → APIs → Link** the environment's Function App.

@@ -30,21 +30,8 @@
     {
         if (!firstRender) return;
 
-        var theme = await JS.InvokeAsync<string>("eval", """
-            (() => {
-                const saved = localStorage.getItem('theme');
-                if (saved) {
-                    document.body.setAttribute('data-theme', saved);
-                    return saved;
-                }
-
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const initial = prefersDark ? 'dark' : 'light';
-                document.body.setAttribute('data-theme', initial);
-                localStorage.setItem('theme', initial);
-                return initial;
-            })()
-        """);
+        var theme = await JS.InvokeAsync<string>("eval",
+            "document.body.getAttribute('data-theme') ?? 'light'");
 
         isDark = theme == "dark";
         StateHasChanged();
@@ -64,28 +51,27 @@
 
 <style>
     .theme-toggle-btn {
-        width: 52px;
-        height: 52px;
-        border: 1px solid var(--border-soft);
+        width: 36px;
+        height: 36px;
+        border: none;
         cursor: pointer;
-        color: var(--text-primary);
+        color: var(--text-secondary);
         border-radius: 50%;
-        background: var(--button-primary-bg);
-        box-shadow: var(--button-shadow);
+        background: transparent;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+        transition: background .2s ease, color .2s ease;
     }
 
         .theme-toggle-btn:hover {
-            transform: translateY(-2px) scale(1.04);
-            box-shadow: var(--button-shadow-hover);
+            background: var(--surface-hover);
+            color: var(--text-primary);
         }
 
     .theme-icon {
-        width: 22px;
-        height: 22px;
+        width: 19px;
+        height: 19px;
         display: block;
     }
 </style>
