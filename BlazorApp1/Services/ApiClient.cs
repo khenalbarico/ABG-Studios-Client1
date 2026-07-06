@@ -6,7 +6,6 @@ using System.Text.Json;
 
 namespace BlazorApp1.Services;
 
-/// <summary>Raised when the API answers with a user-facing error (validation, capacity, auth).</summary>
 public sealed class ApiException(string message, HttpStatusCode statusCode) : Exception(message)
 {
     public HttpStatusCode StatusCode { get; } = statusCode;

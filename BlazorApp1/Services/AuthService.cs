@@ -14,10 +14,6 @@ public sealed class AuthUser
     public string Email => UserDetails.Contains('@') ? UserDetails : "";
 }
 
-/// <summary>
-/// Reads the Static Web Apps auth session from /.auth/me and exposes
-/// the provider login/logout endpoints. One request per session.
-/// </summary>
 public sealed class AuthService(HttpClient _http)
 {
     sealed class AuthPayload
@@ -50,7 +46,6 @@ public sealed class AuthService(HttpClient _http)
         }
         catch (HttpRequestException)
         {
-            // Local dev without the SWA emulator has no /.auth endpoint.
             _user = null;
         }
         catch (JsonException)
